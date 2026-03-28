@@ -1,0 +1,45 @@
+start :-
+    write('===================================================='), nl,
+    write(' Welcome to the Medical Diagnostic Expert System '), nl,
+    write('===================================================='), nl,
+    write('I will ask you a series of questions about your symptoms.'), nl,
+    write('Please answer with "y." for yes, or "n." for no.'), nl,
+    write('(Note: You MUST include the period after your answer!)'), nl, nl,
+    diagnose(Disease),
+    nl, write('----------------------------------------------------'), nl,
+    write(' DIAGNOSIS RESULT: '), write(Disease), nl,
+    write('----------------------------------------------------'), nl,
+    write('Disclaimer: This is an academic AI project, not medical advice.'), nl,
+    undo.
+
+diagnose(Disease) :-
+    hypothesis(Disease), !. % The "!" (cut) stops searching once a match is found.
+diagnose(unknown_illness) :-
+    write('I cannot determine your illness based on the given symptoms.'), nl.
+
+hypothesis(covid_19) :-
+    verify(fever), verify(dry_cough), verify(loss_of_taste_or_smell).
+
+hypothesis(influenza) :-
+    verify(fever), verify(headache), verify(body_ache), verify(chills).
+
+hypothesis(common_cold) :-
+    verify(sneezing), verify(runny_nose), verify(sore_throat).
+
+hypothesis(allergies) :-
+    verify(sneezing), verify(watery_eyes), verify(itchy_nose).
+
+verify(Symptom) :-
+    (known(yes, Symptom) -> true ;
+    (known(no, Symptom) -> fail ;
+     ask(Symptom))).
+
+
+ask(Symptom) :-
+    write('Do you have this symptom - '), write(Symptom), write('? (y./n.): '),
+    read(Response),
+    ( (Response == yes ; Response == y)
+      -> asserta(known(yes, Symptom)) ;
+         asserta(known(no, Symptom)), fail).
+
+undo :- retractall(known(_, _)).
